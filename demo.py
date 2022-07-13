@@ -19,7 +19,7 @@ if __name__ == "__main__":
   n_imgs = 1000
   cam_intr = np.loadtxt("data/camera-intrinsics.txt", delimiter=' ')
   vol_bnds = np.zeros((3,2))
-  for i in range(n_imgs):
+  for i in range(0, n_imgs, 1):
     # Read depth image and camera pose
     depth_im = cv2.imread("data/frame-%06d.depth.png"%(i),-1).astype(float)
     depth_im /= 1000.  # depth is saved in 16-bit PNG in millimeters
@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
   # Loop through RGB-D images and fuse them together
   t0_elapse = time.time()
-  for i in range(n_imgs):
+  for i in range(0, n_imgs, 1):
     print("Fusing frame %d/%d"%(i+1, n_imgs))
 
     # Read RGB-D image and camera pose
