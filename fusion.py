@@ -325,6 +325,7 @@ class TSDFVolume:
     tsdf_vol, color_vol = self.get_volume()
 
     # Marching cubes
+    print("tsdf_vol min and max: ", tsdf_vol.min(), tsdf_vol.max())
     verts, faces, norms, vals = measure.marching_cubes_lewiner(tsdf_vol, level=0)
     verts_ind = np.round(verts).astype(int)
     verts = verts*self._voxel_size+self._vol_origin  # voxel grid coordinates to world coordinates

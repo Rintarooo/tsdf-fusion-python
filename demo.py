@@ -8,6 +8,20 @@ import numpy as np
 
 import fusion
 
+def modify_depthmap(src):
+  depth_min, depth_max = 0.5, 6.0
+  near, far = 1./depth_min, 1./depth_max
+  minv, maxv = far, near
+  h, w = src.shape
+  dst = np.zeros_like(src)
+
+  # https://github.com/Rintarooo/dtam/blob/1272fad70d92228d4706a46545980637d748082c/Viewer3D/pcl3d.cpp#L185-L186
+  for v in range(h):
+    for u in range(w):
+      srcv = src[v,u]
+      inv_depth_val = (srcv * (maxv - minv))/65535. + minv
+      if(inv_depth_val != 0): dst[v,u] = 1./inv_depth_val       
+  return dst
 
 if __name__ == "__main__":
   # ======================================================================================================== #
@@ -26,7 +40,9 @@ if __name__ == "__main__":
     # Read depth image and camera pose
     # depth_im = cv2.imread("data/frame-%06d.depth.png"%(i),-1).astype(float)
     depth_im = cv2.imread("input/icl_nuim/of_kt0/depth_v1/%d.png"%(i),-1).astype(float)
-    
+
+    # 
+    depth_im = modify_depthmap(depth_im)
     
     # depth_im /= 1000.  # depth is saved in 16-bit PNG in millimeters
     # depth_im[depth_im == 65.535] = 0  # set invalid depth to 0 (specific to 7-scenes dataset)
@@ -45,15 +61,17 @@ if __name__ == "__main__":
   # ======================================================================================================== #
   # Initialize voxel volume
   print("Initializing voxel volume...")
-  tsdf_vol = fusion.TSDFVolume(vol_bnds, voxel_size=0.02)
+  # tsdf_vol = fusion.TSDFVolume(vol_bnds, voxel_size=0.02)
+  tsdf_vol = fusion.TSDFVolume(vol_bnds, voxel_size=0.1)
 
   # Loop through RGB-D images and fuse them together
   t0_elapse = time.time()
-  for i in range(0, n_imgs, 1):
+  # for i in range(0, n_imgs, 1):
+  for i in range(1, n_imgs, 1):
     print("Fusing frame %d/%d"%(i+1, n_imgs))
 
     # Read RGB-D image and camera pose
-    color_image = cv2.cvtColor(cv2.imread("input/icl_nuim/of_kt0/rgb/%dpng"%(i)), cv2.COLOR_BGR2RGB)
+    color_image = cv2.cvtColor(cv2.imread("input/icl_nuim/of_kt0/rgb/%d.png"%(i)), cv2.COLOR_BGR2RGB)
     
     # depth_im = cv2.imread("data/frame-%06d.depth.png"%(i),-1).astype(float)
     depth_im = cv2.imread("input/icl_nuim/of_kt0/depth_v1/%d.png"%(i),-1).astype(float)
