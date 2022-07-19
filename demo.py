@@ -30,20 +30,24 @@ if __name__ == "__main__":
   # frustums in the dataset
   # ======================================================================================================== #
   print("Estimating voxel volume bounds...")
-  n_imgs = 100
+  n_imgs = 50
   cam_intr = np.loadtxt("input/icl_nuim/of_kt0/data/camera-intrinsics.txt", delimiter=' ')
   vol_bnds = np.zeros((3,2))
   
+  print("cam_intr: ", cam_intr)
   # for i in range(0, n_imgs, 1):
   for i in range(1, n_imgs, 1):
-    
+    print("i: ", i)
     # Read depth image and camera pose
     # depth_im = cv2.imread("data/frame-%06d.depth.png"%(i),-1).astype(float)
     depth_im = cv2.imread("input/icl_nuim/of_kt0/depth_v1/%d.png"%(i),-1).astype(float)
 
-    # 
     depth_im = modify_depthmap(depth_im)
-    
+    ## debug
+    # depth_max = np.max(depth_im)
+    # depth_min = np.min(depth_im)
+    # print("depth_min: {}\ndepth_max: {}".format(depth_min, depth_max))
+
     # depth_im /= 1000.  # depth is saved in 16-bit PNG in millimeters
     # depth_im[depth_im == 65.535] = 0  # set invalid depth to 0 (specific to 7-scenes dataset)
     # cam_pose = np.loadtxt("data/frame-%06d.pose.txt"%(i))  # 4x4 rigid transformation matrix
@@ -54,6 +58,7 @@ if __name__ == "__main__":
     view_frust_pts = fusion.get_view_frustum(depth_im, cam_intr, cam_pose)
     vol_bnds[:,0] = np.minimum(vol_bnds[:,0], np.amin(view_frust_pts, axis=1))
     vol_bnds[:,1] = np.maximum(vol_bnds[:,1], np.amax(view_frust_pts, axis=1))
+    # print("vol_bnds: ", vol_bnds)
   # ======================================================================================================== #
 
   # ======================================================================================================== #
@@ -62,7 +67,7 @@ if __name__ == "__main__":
   # Initialize voxel volume
   print("Initializing voxel volume...")
   # tsdf_vol = fusion.TSDFVolume(vol_bnds, voxel_size=0.02)
-  tsdf_vol = fusion.TSDFVolume(vol_bnds, voxel_size=0.1)
+  tsdf_vol = fusion.TSDFVolume(vol_bnds, voxel_size=0.5)
 
   # Loop through RGB-D images and fuse them together
   t0_elapse = time.time()
