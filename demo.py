@@ -40,6 +40,9 @@ if __name__ == "__main__":
     print("i: ", i)
     # Read depth image and camera pose
     # depth_im = cv2.imread("data/frame-%06d.depth.png"%(i),-1).astype(float)
+    
+    # depth_im = cv2.imread("input/icl_nuim/of_kt0/depth_v0/%d.png"%(i),-1).astype(float)
+    # depth_im /= 5000.  # depth is saved in 16-bit PNG in millimeters
     depth_im = cv2.imread("input/icl_nuim/of_kt0/depth_v1/%d.png"%(i),-1).astype(float)
 
     depth_im = modify_depthmap(depth_im)
@@ -66,8 +69,8 @@ if __name__ == "__main__":
   # ======================================================================================================== #
   # Initialize voxel volume
   print("Initializing voxel volume...")
-  # tsdf_vol = fusion.TSDFVolume(vol_bnds, voxel_size=0.02)
-  tsdf_vol = fusion.TSDFVolume(vol_bnds, voxel_size=0.5)
+  tsdf_vol = fusion.TSDFVolume(vol_bnds, voxel_size=0.02)
+  # tsdf_vol = fusion.TSDFVolume(vol_bnds, voxel_size=0.5)
 
   # Loop through RGB-D images and fuse them together
   t0_elapse = time.time()
@@ -82,6 +85,8 @@ if __name__ == "__main__":
     depth_im = cv2.imread("input/icl_nuim/of_kt0/depth_v1/%d.png"%(i),-1).astype(float)
     # depth_im /= 1000.
     # depth_im[depth_im == 65.535] = 0
+    depth_im = modify_depthmap(depth_im)
+
 
     # cam_pose = np.loadtxt("data/frame-%06d.pose.txt"%(i))
     cam_pose = np.loadtxt("input/icl_nuim/of_kt0/data/pose/%d.txt"%(i))
